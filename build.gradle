@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+}
+
+group 'de.ars.samples.lambda'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // contains the handler interface (required)
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
+    // contains pre-defined events/responses
+    // (e.g. for invocation from API Gateway)
+    implementation 'com.amazonaws:aws-lambda-java-events:3.11.2'
+
+    implementation 'com.amazonaws:aws-lambda-java-log4j2:1.5.1'
+
+    // we want to replace default deserialization by Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+
+    // we want to use Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+// This is the simplest way to include dependencies.
+// Instead of uploading the files with each deployment,
+// we could put them into AWS Lambda "layers".
+task packageJar(type: Zip) {
+    into('lib') {
+        from(jar)
+        from(configurations.runtimeClasspath)
+    }
+}
+
+build.dependsOn packageJar
